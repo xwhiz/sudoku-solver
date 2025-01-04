@@ -20,7 +20,54 @@ func main() {
 	board := readBoard("board.txt")
 
 	const logBoard = false
-	domainBasedSolution(board, logBoard)
+	// domainBasedSolution(board, logBoard)
+	backtrackingSolution(board)
+}
+
+func backtrackingSolution(board [][]int) bool {
+	if hasWon(board) {
+		printBoard(board)
+		return true
+	}
+
+	for i, row := range board {
+		for j, v := range row {
+			if v != 0 {
+				continue
+			}
+
+			cellDomain := getCellDomain(board, i, j)
+
+			for _, num := range cellDomain {
+				boardCopy := make([][]int, len(board))
+				for i := range board {
+					boardCopy[i] = make([]int, len(board[i]))
+					copy(boardCopy[i], board[i])
+				}
+				if isInvalidatingAnyDomain(boardCopy, i, j, num) {
+					continue
+				}
+
+				if backtrackingSolution(board) {
+					return true
+				}
+			}
+		}
+	}
+	return false
+}
+
+func isInvalidatingAnyDomain(board [][]int, row int, col int, num int) bool {
+	board[row][col] = num
+
+	for i := range board {
+		for j := range row {
+			if len(getCellDomain(board, i, j)) == 0 {
+				return true
+			}
+		}
+	}
+	return false
 }
 
 func domainBasedSolution(board [][]int, logBoard bool) {
@@ -95,28 +142,28 @@ func findNewPossibilities(board [][]int) []Value {
 	possibilities := []Value{}
 	for i, row := range board {
 		for j, v := range row {
-			currentColumnValues := getItemsInCol(board, j)
 			if v != 0 {
 				continue
 			}
-
-			possibleNums := []int{}
-			for num := 1; num <= 9; num++ {
-				if slices.Contains(row, num) {
-					continue
-				}
-				if slices.Contains(currentColumnValues, num) {
-					continue
-				}
-				if slices.Contains(getItemsInCurrentBlock(board, i, j), num) {
-					continue
-				}
-				possibleNums = append(possibleNums, num)
-			}
+			possibleNums := getCellDomain(board, i, j)
 			possibilities = append(possibilities, Value{row: i, col: j, possibilities: possibleNums})
 		}
 	}
 	return possibilities
+}
+
+func getCellDomain(board [][]int, row int, col int) []int {
+	domain := []int{}
+	rowValues := board[row]
+	colValues := getItemsInCol(board, col)
+	blockValues := getItemsInCurrentBlock(board, row, col)
+	for num := 1; num <= 9; num++ {
+		if slices.Contains(rowValues, num) || slices.Contains(colValues, num) || slices.Contains(blockValues, num) {
+			continue
+		}
+		domain = append(domain, num)
+	}
+	return domain
 }
 
 func getItemsInCol(board [][]int, col int) []int {
