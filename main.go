@@ -33,25 +33,24 @@ func main() {
 			break
 		}
 
-		top := possibilities[0]
-		for i := 0; i < len(possibilities)-1; i++ {
-			if len(possibilities[i].possibilities) == 0 {
-				top = possibilities[i+1]
+		if len(possibilities[0].possibilities) > 1 {
+			fmt.Println("Possibilities")
+			fmt.Println(possibilities[0])
+			log.Fatalf("Please enter a valid board. The given board has no solution.")
+		}
+
+		for _, p := range possibilities {
+			if len(p.possibilities) == 0 {
+				log.Fatalf("No solution is possible for given board. Please enter a valid board.")
+			}
+
+			if len(p.possibilities) == 1 {
+				fmt.Printf("Change %d %d to %d\n", p.row+1, p.col+1, p.possibilities[0])
+				board[p.row][p.col] = p.possibilities[0]
 			}
 		}
 
-		if len(top.possibilities) != 1 {
-			fmt.Println("Logging the possibilities array")
-			for _, p := range possibilities {
-				fmt.Println(p)
-			}
-			log.Fatalf("Unable to find any cell with possibility of only 1 number.")
-		}
-
-		fmt.Printf("Change %d %d to %d\n", top.row+1, top.col+1, top.possibilities[0])
-		board[top.row][top.col] = top.possibilities[0]
 		i += 1
-
 		if logBoard {
 			printBoard(board)
 		}
