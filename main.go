@@ -25,8 +25,8 @@ func main() {
 		{0, 0, 0, 9, 0, 4, 0, 3, 0},
 	}
 
-	const logBoard = false
-	const maxIters int = 100
+	const logBoard = true
+	const maxIters int = 1
 	i := 0
 
 	for !hasWon(board) && i < maxIters {
@@ -54,17 +54,13 @@ func main() {
 		i += 1
 
 		if logBoard {
-			for _, row := range board {
-				fmt.Println(row)
-			}
+			printBoard(board)
 		}
 	}
 
 	if hasWon(board) {
 		fmt.Println("Completed the board.")
-		for _, row := range board {
-			fmt.Println(row)
-		}
+		printBoard(board)
 	}
 
 }
@@ -139,4 +135,33 @@ func hasWon(board [][]int) bool {
 	return true
 }
 
-func lo
+func printBoard(board [][]int) {
+	for i, row := range board {
+		if i%3 == 0 || i == 0 {
+			for range 25 {
+				fmt.Print("-")
+			}
+			fmt.Println()
+		}
+
+		for j, v := range row {
+			if (j)%3 == 0 {
+				fmt.Print("| ")
+			}
+			fmt.Printf("%d ", v)
+
+			if j == len(row)-1 {
+				fmt.Print("| ")
+			}
+		}
+		fmt.Println()
+
+		if i == len(board)-1 {
+			for range 25 {
+				fmt.Print("-")
+			}
+			fmt.Println()
+		}
+
+	}
+}
