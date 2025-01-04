@@ -1,9 +1,13 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
 	"log"
+	"os"
 	"slices"
+	"strconv"
+	"strings"
 )
 
 type Value struct {
@@ -13,17 +17,18 @@ type Value struct {
 }
 
 func main() {
-	board := [][]int{
-		{7, 0, 3, 0, 0, 9, 1, 0, 5},
-		{0, 1, 5, 0, 0, 8, 0, 6, 0},
-		{9, 0, 0, 5, 6, 0, 0, 7, 4},
-		{0, 0, 0, 8, 0, 2, 4, 0, 0},
-		{3, 9, 0, 0, 0, 0, 0, 0, 0},
-		{0, 8, 0, 1, 9, 6, 0, 5, 3},
-		{5, 4, 9, 0, 1, 3, 0, 0, 7},
-		{0, 0, 0, 2, 5, 0, 0, 4, 9},
-		{0, 0, 0, 9, 0, 4, 0, 3, 0},
-	}
+	board := readBoard("board.txt")
+	// board = [][]int{
+	// 	{7, 0, 3, 0, 0, 9, 1, 0, 5},
+	// 	{0, 1, 5, 0, 0, 8, 0, 6, 0},
+	// 	{9, 0, 0, 5, 6, 0, 0, 7, 4},
+	// 	{0, 0, 0, 8, 0, 2, 4, 0, 0},
+	// 	{3, 9, 0, 0, 0, 0, 0, 0, 0},
+	// 	{0, 8, 0, 1, 9, 6, 0, 5, 3},
+	// 	{5, 4, 9, 0, 1, 3, 0, 0, 7},
+	// 	{0, 0, 0, 2, 5, 0, 0, 4, 9},
+	// 	{0, 0, 0, 9, 0, 4, 0, 3, 0},
+	// }
 
 	const logBoard = false
 	const maxIters int = 81
@@ -70,6 +75,33 @@ func main() {
 
 }
 
+func readBoard(name string) [][]int {
+	f, err := os.Open(name)
+	if err != nil {
+		log.Fatalf("Unable to open the file\n")
+	}
+
+	result := [][]int{}
+
+	scanner := bufio.NewScanner(f)
+	for scanner.Scan() {
+		line := scanner.Text()
+
+		arr := strings.Split(line, " ")
+		row := []int{}
+		for _, item := range arr {
+			num, err := strconv.Atoi(item)
+			if err != nil {
+				log.Fatalf("Unable to convert string to number\n")
+			}
+			row = append(row, num)
+		}
+		result = append(result, [][]int{row}...)
+	}
+
+	return result
+}
+
 func findNewPossibilities(board [][]int) []Value {
 	possibilities := []Value{}
 	for i, row := range board {
@@ -81,27 +113,18 @@ func findNewPossibilities(board [][]int) []Value {
 
 			possibleNums := []int{}
 			for num := 1; num <= 9; num++ {
-				// check for row
 				if slices.Contains(row, num) {
 					continue
 				}
-
-				// check for column
-
 				if slices.Contains(currentColumnValues, num) {
 					continue
 				}
-
-				// check for in current block
 				if slices.Contains(getItemsInCurrentBlock(board, i, j), num) {
 					continue
 				}
-
 				possibleNums = append(possibleNums, num)
 			}
-
-			possibility := Value{row: i, col: j, possibilities: possibleNums}
-			possibilities = append(possibilities, possibility)
+			possibilities = append(possibilities, Value{row: i, col: j, possibilities: possibleNums})
 		}
 	}
 	return possibilities
