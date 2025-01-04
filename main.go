@@ -20,10 +20,11 @@ func main() {
 	board := readBoard("board.txt")
 
 	const logBoard = false
-	const maxIters int = 81
-	i := 0
+	domainBasedSolution(board, logBoard)
+}
 
-	for !hasWon(board) && i < maxIters {
+func domainBasedSolution(board [][]int, logBoard bool) {
+	for !hasWon(board) {
 		possibilities := findNewPossibilities(board)
 		slices.SortFunc(possibilities, func(a Value, b Value) int {
 			return len(a.possibilities) - len(b.possibilities)
@@ -52,7 +53,6 @@ func main() {
 			}
 		}
 
-		i += 1
 		if logBoard {
 			printBoard(board)
 		}
@@ -62,7 +62,6 @@ func main() {
 		fmt.Println("Completed the board.")
 		printBoard(board)
 	}
-
 }
 
 func readBoard(name string) [][]int {
