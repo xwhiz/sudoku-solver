@@ -35,7 +35,9 @@ func main() {
 
 		if len(possibilities[0].possibilities) > 1 {
 			fmt.Println("Possibilities")
-			fmt.Println(possibilities[0])
+			for _, p := range possibilities {
+				fmt.Println(p)
+			}
 			log.Fatalf("Please enter a valid board. The given board has no solution.")
 		}
 
