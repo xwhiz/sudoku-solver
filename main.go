@@ -21,12 +21,12 @@ func main() {
 		{3, 9, 0, 0, 0, 0, 0, 0, 0},
 		{0, 8, 0, 1, 9, 6, 0, 5, 3},
 		{5, 4, 9, 0, 1, 3, 0, 0, 7},
-		{0, 0, 0, 9, 0, 4, 0, 3, 0},
+		{0, 0, 0, 2, 5, 0, 0, 4, 9},
 		{0, 0, 0, 9, 0, 4, 0, 3, 0},
 	}
 
-	const logBoard = true
-	const maxIters int = 1
+	const logBoard = false
+	const maxIters int = 81
 	i := 0
 
 	for !hasWon(board) && i < maxIters {
@@ -40,6 +40,11 @@ func main() {
 		}
 
 		top := possibilities[0]
+		for i := 0; i < len(possibilities)-1; i++ {
+			if len(possibilities[i].possibilities) == 0 {
+				top = possibilities[i+1]
+			}
+		}
 
 		if len(top.possibilities) != 1 {
 			fmt.Println("Logging the possibilities array")
@@ -69,6 +74,7 @@ func findNewPossibilities(board [][]int) []Value {
 	possibilities := []Value{}
 	for i, row := range board {
 		for j, v := range row {
+			currentColumnValues := getItemsInCol(board, j)
 			if v != 0 {
 				continue
 			}
@@ -81,13 +87,8 @@ func findNewPossibilities(board [][]int) []Value {
 				}
 
 				// check for column
-				isValueInCurrentCol := false
-				for k := range board {
-					if board[k][j] == num {
-						isValueInCurrentCol = true
-					}
-				}
-				if isValueInCurrentCol {
+
+				if slices.Contains(currentColumnValues, num) {
 					continue
 				}
 
@@ -104,6 +105,18 @@ func findNewPossibilities(board [][]int) []Value {
 		}
 	}
 	return possibilities
+}
+
+func getItemsInCol(board [][]int, col int) []int {
+	items := []int{}
+	for k := 0; k < 9; k++ {
+		v := board[k][col]
+		if v == 0 {
+			continue
+		}
+		items = append(items, v)
+	}
+	return items
 }
 
 func getItemsInCurrentBlock(board [][]int, row int, col int) []int {
